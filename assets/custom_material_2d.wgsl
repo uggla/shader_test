@@ -31,7 +31,11 @@ fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
     // return material_color * textureSample(base_color_texture, base_color_sampler, mesh.uv) * COLOR_MULTIPLIER;
     // return material_color ;
     let uv = mesh.uv;
+    let init_color = vec3f(1.0, 2.0, 3.0);
+
     var normalised_uv = (uv.xy * 2.0) - 1.0;
+
+
     //let resolution = view.viewport.zw;
     //normalised_uv.x *= resolution.x / resolution.y;
     //normalised_uv *= rotate2D(PI * globals.time / -2.0); // Our uvs are by default a -1,-1 in uppermost left cnr, this rotates you around.   let normalised_uv = (uv.xy * 2.0) - 1.0; // If you want 0,0 to be at the 'center' of your Mesh's geometry.
@@ -39,12 +43,13 @@ fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
     var distance = sdCircle(normalised_uv, 0.5);
     distance = sin(distance * 8.0 + globals.time) / 8.0;
     distance = abs(distance);
-    distance = smoothstep(0.0, 0.1, distance);
+    //distance = smoothstep(0.0, 0.1, distance);
+    distance = 0.02 / distance;
 
 
     // Map the distance to a grayscale color
     //let color_value = 1.0 - clamp(distance * 10.0, 0.0, 1.0);
-    let color_value = vec3f(distance, distance, distance);
+    let color_value = distance * init_color;
 
     return vec4f(vec3f(color_value), 1.0);
 }
