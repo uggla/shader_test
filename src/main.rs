@@ -30,7 +30,7 @@ fn setup(
     // quad
     commands.spawn(MaterialMesh2dBundle {
         mesh: meshes.add(Rectangle::default()).into(),
-        transform: Transform::default().with_scale(Vec3::splat(256.)),
+        transform: Transform::default().with_scale(Vec3::splat(720.)),
         material: materials.add(CustomMaterial {
             color: Color::GOLD,
             // color_texture: Some(asset_server.load("icon.png")),
