@@ -9,7 +9,7 @@ use bevy::{
     sprite::{Material2d, Material2dPlugin, MaterialMesh2dBundle},
 };
 
-#[derive(Parser)]
+#[derive(Parser, Clone)]
 #[command(version, about, long_about = None)]
 struct Cli {
     /// Shader name
@@ -19,7 +19,9 @@ struct Cli {
 #[derive(Clone, ValueEnum, Debug, PartialEq, Eq)]
 enum ShaderNameValue {
     Water,
-    Truc,
+    Goldcube,
+    Circle,
+    HypnoticCircle,
 }
 
 #[derive(Resource)]
@@ -29,23 +31,30 @@ fn main() {
     let cli = Cli::parse();
 
     // You can check the value provided by positional arguments, or option arguments
-    println!("Value for name: {:?}", cli.name);
+    dbg!("Value for name: {:?}", &cli.name);
 
-    App::new()
-        .insert_resource(ShaderName(cli.name))
-        .add_plugins((
-            DefaultPlugins,
-            Material2dPlugin::<CustomMaterial>::default(),
-        ))
-        .add_systems(Startup, setup)
-        .run();
+    let mut app = App::new();
+
+    app.insert_resource(ShaderName(cli.name))
+        .add_plugins(DefaultPlugins)
+        .add_systems(Startup, setup);
+
+    app.add_plugins(Material2dPlugin::<WaterMaterial>::default());
+    app.add_plugins(Material2dPlugin::<GoldcubeMaterial>::default());
+    app.add_plugins(Material2dPlugin::<CircleMaterial>::default());
+    app.add_plugins(Material2dPlugin::<HypnoticCircleMaterial>::default());
+
+    app.run();
 }
 
 // Setup a simple 2d scene
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<CustomMaterial>>,
+    mut water: ResMut<Assets<WaterMaterial>>,
+    mut gold_cube: ResMut<Assets<GoldcubeMaterial>>,
+    mut circle: ResMut<Assets<CircleMaterial>>,
+    mut hypnotic_circle: ResMut<Assets<HypnoticCircleMaterial>>,
     shader_name: Res<ShaderName>,
     // asset_server: Res<AssetServer>,
 ) {
@@ -58,18 +67,40 @@ fn setup(
             commands.spawn(MaterialMesh2dBundle {
                 mesh: meshes.add(Rectangle::default()).into(),
                 transform: Transform::default().with_scale(Vec3::splat(720.)),
-                material: materials.add(CustomMaterial {
+                material: water.add(WaterMaterial {
                     // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
                 }),
                 ..default()
             });
         }
-        ShaderNameValue::Truc => {
+        ShaderNameValue::Goldcube => {
             commands.spawn(MaterialMesh2dBundle {
                 mesh: meshes.add(Rectangle::default()).into(),
                 transform: Transform::default().with_scale(Vec3::splat(720.)),
-                material: materials.add(TrucMaterial {
+                material: gold_cube.add(GoldcubeMaterial {
+                    // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
+                    color: LinearRgba::from(color::palettes::css::GOLD),
+                }),
+                ..default()
+            });
+        }
+        ShaderNameValue::Circle => {
+            commands.spawn(MaterialMesh2dBundle {
+                mesh: meshes.add(Rectangle::default()).into(),
+                transform: Transform::default().with_scale(Vec3::splat(720.)),
+                material: circle.add(CircleMaterial {
+                    // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
+                    color: LinearRgba::from(color::palettes::css::GOLD),
+                }),
+                ..default()
+            });
+        }
+        ShaderNameValue::HypnoticCircle => {
+            commands.spawn(MaterialMesh2dBundle {
+                mesh: meshes.add(Rectangle::default()).into(),
+                transform: Transform::default().with_scale(Vec3::splat(720.)),
+                material: hypnotic_circle.add(HypnoticCircleMaterial {
                     // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
                 }),
@@ -81,7 +112,7 @@ fn setup(
 
 // This is the struct that will be passed to your shader
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
-struct CustomMaterial {
+struct WaterMaterial {
     #[uniform(0)]
     color: LinearRgba,
     // #[texture(1)]
@@ -91,22 +122,14 @@ struct CustomMaterial {
 
 /// The Material2d trait is very configurable, but comes with sensible defaults for all methods.
 /// You only need to implement functions for features that need non-default behavior. See the Material2d api docs for details!
-impl Material2d for CustomMaterial {
+impl Material2d for WaterMaterial {
     fn fragment_shader() -> ShaderRef {
         "water_material.wgsl".into()
     }
 }
 
-impl From<TrucMaterial> for CustomMaterial {
-    fn from(material: TrucMaterial) -> Self {
-        CustomMaterial {
-            color: material.color,
-        }
-    }
-}
-
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
-struct TrucMaterial {
+struct GoldcubeMaterial {
     #[uniform(0)]
     color: LinearRgba,
     // #[texture(1)]
@@ -114,8 +137,38 @@ struct TrucMaterial {
     // color_texture: Option<Handle<Image>>,
 }
 
-impl Material2d for TrucMaterial {
+impl Material2d for GoldcubeMaterial {
     fn fragment_shader() -> ShaderRef {
-        "truc_material.wgsl".into()
+        "gold_cube_material.wgsl".into()
+    }
+}
+
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
+struct CircleMaterial {
+    #[uniform(0)]
+    color: LinearRgba,
+    // #[texture(1)]
+    // #[sampler(2)]
+    // color_texture: Option<Handle<Image>>,
+}
+
+impl Material2d for CircleMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "circle_material.wgsl".into()
+    }
+}
+
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
+struct HypnoticCircleMaterial {
+    #[uniform(0)]
+    color: LinearRgba,
+    // #[texture(1)]
+    // #[sampler(2)]
+    // color_texture: Option<Handle<Image>>,
+}
+
+impl Material2d for HypnoticCircleMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "hypnotic_circle_material.wgsl".into()
     }
 }
