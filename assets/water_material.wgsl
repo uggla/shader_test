@@ -10,8 +10,8 @@
 #import "shader_utils.wgsl"::shader_toy_default
 #import "shader_utils.wgsl"::rotate2D
 #import "shader_utils.wgsl"::TAU
+#import bevy_render::view::View
 
-#import bevy_render::view  View
 @group(0) @binding(0) var<uniform> view: View;
 
 const MAX_ITER: i32 = 3;

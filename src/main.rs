@@ -12,7 +12,6 @@ use bevy::{
 #[derive(Parser, Clone)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// Shader name
     name: ShaderNameValue,
 }
 
@@ -68,7 +67,7 @@ fn setup(
                 mesh: meshes.add(Rectangle::default()).into(),
                 transform: Transform::default().with_scale(Vec3::splat(720.)),
                 material: water.add(WaterMaterial {
-                    // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
+                    // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
                 }),
                 ..default()
@@ -79,7 +78,6 @@ fn setup(
                 mesh: meshes.add(Rectangle::default()).into(),
                 transform: Transform::default().with_scale(Vec3::splat(720.)),
                 material: gold_cube.add(GoldcubeMaterial {
-                    // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
                 }),
                 ..default()
@@ -90,7 +88,6 @@ fn setup(
                 mesh: meshes.add(Rectangle::default()).into(),
                 transform: Transform::default().with_scale(Vec3::splat(720.)),
                 material: circle.add(CircleMaterial {
-                    // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
                 }),
                 ..default()
@@ -101,7 +98,6 @@ fn setup(
                 mesh: meshes.add(Rectangle::default()).into(),
                 transform: Transform::default().with_scale(Vec3::splat(720.)),
                 material: hypnotic_circle.add(HypnoticCircleMaterial {
-                    // color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
                 }),
                 ..default()
@@ -132,9 +128,6 @@ impl Material2d for WaterMaterial {
 struct GoldcubeMaterial {
     #[uniform(0)]
     color: LinearRgba,
-    // #[texture(1)]
-    // #[sampler(2)]
-    // color_texture: Option<Handle<Image>>,
 }
 
 impl Material2d for GoldcubeMaterial {
@@ -147,9 +140,6 @@ impl Material2d for GoldcubeMaterial {
 struct CircleMaterial {
     #[uniform(0)]
     color: LinearRgba,
-    // #[texture(1)]
-    // #[sampler(2)]
-    // color_texture: Option<Handle<Image>>,
 }
 
 impl Material2d for CircleMaterial {
@@ -162,9 +152,6 @@ impl Material2d for CircleMaterial {
 struct HypnoticCircleMaterial {
     #[uniform(0)]
     color: LinearRgba,
-    // #[texture(1)]
-    // #[sampler(2)]
-    // color_texture: Option<Handle<Image>>,
 }
 
 impl Material2d for HypnoticCircleMaterial {

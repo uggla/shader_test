@@ -1,9 +1,8 @@
 #import bevy_sprite::mesh2d_vertex_output::VertexOutput
 // we can import items from shader modules in the assets folder with a quoted path
 #import "custom_material_import.wgsl"::COLOR_MULTIPLIER
-
-#import bevy_render::view View
-#import bevy_sprite::mesh2d_view_bindings   globals
+#import bevy_render::view::View
+#import bevy_sprite::mesh2d_view_bindings::globals
 
 @group(0) @binding(0) var<uniform> view: View;
 @group(2) @binding(0) var<uniform> material_color: vec4<f32>;
