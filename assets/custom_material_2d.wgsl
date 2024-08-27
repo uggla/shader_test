@@ -1,75 +1,57 @@
+/// ***************************** ///
+/// This is a shadertoy port of 'Tileable Water Caustic' by Dave_Hoskins, who claims to of sound it on glsl sandbox, by 'joltz0r'
+/// I have been unable to find the original.
+/// ***************************** ///
+
 #import bevy_sprite::mesh2d_vertex_output::VertexOutput
-// we can import items from shader modules in the assets folder with a quoted path
-#import "custom_material_import.wgsl"::COLOR_MULTIPLIER
+#import bevy_sprite::mesh2d_view_bindings::globals
+#import "shader_utils.wgsl"::NEG_HALF_PI
+#import "shader_utils.wgsl"::NEG_HALF_PI
+#import "shader_utils.wgsl"::shader_toy_default
+#import "shader_utils.wgsl"::rotate2D
+#import "shader_utils.wgsl"::TAU
 
-#import bevy_render::view View
-#import bevy_sprite::mesh2d_view_bindings   globals
-
+#import bevy_render::view  View
 @group(0) @binding(0) var<uniform> view: View;
-@group(2) @binding(0) var<uniform> material_color: vec4<f32>;
-// @group(2) @binding(1) var base_color_texture: texture_2d<f32>;
-// @group(2) @binding(2) var base_color_sampler: sampler;
 
-const TAU:f32 =  6.28318530718;
-const PI:f32 = 3.1415926535897932384626433832795;
-
-fn rotate2D(angle: f32) -> mat2x2<f32> {
-    let c = cos(angle);
-    let s = sin(angle);
-    return mat2x2<f32>(
-        vec2<f32>(c, -s),
-        vec2<f32>(s, c)
-    );
-}
-
-fn sdCircle(p: vec2f, r: f32) -> f32 {
-    return length(p) - r;
-}
+const MAX_ITER: i32 = 3;
+const SPEED:f32 = 1.0;
 
 @fragment
-fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
-    // return material_color * textureSample(base_color_texture, base_color_sampler, mesh.uv) * COLOR_MULTIPLIER;
-    // return material_color ;
-    let uv = mesh.uv;
-    let init_color = vec3f(1.0, 2.0, 3.0);
+fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
+    let time: f32 = globals.time * 0.5 + 23.0;
+    var uv: vec2<f32> = in.uv;
 
-    var normalised_uv = (uv.xy * 2.0) - 1.0;
+    // Tiling calculation
+    var p: vec2<f32>;
+    // Note: Choose one of the following two lines based on whether SHOW_TILING is defined or not
+    // p = uv * TAU * 2.0 % TAU - 250.0;  // show TILING
+    p = uv * TAU % TAU - 250.0;           // hide TILING
+
+    var i: vec2<f32> = vec2<f32>(p); // iterator position
+    var c: f32 = 1.0; // colour intensity
+    let inten: f32 = 0.005; // Intensity factor
+
+    for (var n: i32 = 0; n < MAX_ITER; n = n + 1) {
+        let t: f32 = time * (1.0 - (3.5 / f32(n + 1)));
+        i = p + vec2<f32>(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
+        c += 1.0 / length(vec2<f32>(p.x / (sin(i.x + t) / inten), p.y / (cos(i.y + t) / inten)));
+    }
+
+    // c = colour intensity
+    c /= f32(MAX_ITER);
+    c = 1.17 - pow(c, 1.4);
+    var colour: vec3<f32> = vec3<f32>(pow(abs(c), 8.0));
+    colour = clamp(colour + vec3<f32>(0.0, 0.35, 0.5), vec3<f32>(0.0, 0.0, 0.0), vec3<f32>(1.0, 1.0, 1.0));
 
 
-    //let resolution = view.viewport.zw;
-    //normalised_uv.x *= resolution.x / resolution.y;
-    //normalised_uv *= rotate2D(PI * globals.time / -2.0); // Our uvs are by default a -1,-1 in uppermost left cnr, this rotates you around.   let normalised_uv = (uv.xy * 2.0) - 1.0; // If you want 0,0 to be at the 'center' of your Mesh's geometry.
+    // Show grid:
+    // let pixel: vec2<f32> = vec2<f32>(2.0) / view.viewport.zw;
+    // uv *= 2.0;
+    // let flash: f32 = floor(globals.time * 0.5 % 2.0);
+    // let first: vec2<f32> = step(pixel, uv) * flash;
+    // uv = step(fract(uv), pixel);
+    // colour = mix(colour, vec3<f32>(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y);
 
-    var distance = sdCircle(normalised_uv, 0.5);
-    distance = sin(distance * 8.0 + globals.time) / 8.0;
-    distance = abs(distance);
-    //distance = smoothstep(0.0, 0.1, distance);
-    distance = 0.02 / distance;
-
-
-    // Map the distance to a grayscale color
-    //let color_value = 1.0 - clamp(distance * 10.0, 0.0, 1.0);
-    let color_value = distance * init_color;
-
-    return vec4f(vec3f(color_value), 1.0);
-}
-
-//@fragment
-//fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
-//    var uv = (in.uv * 2.0) - 1.0;
-//    var col = vec3f(0.);
-//
-//    let distance_to_center = vec2(0.25) - uv;
-//    let angle = atan2(distance_to_center.y, distance_to_center.x);
-//    let radius = length(distance_to_center) * 5.0;
-//
-//    col = hsv_to_srgb(vec3f((angle / TAU) + globals.time / 3.0, radius, 1.0));
-//    return vec4f(col, 1.0);
-//}
-
-// From the bevy source code
-fn hsv_to_srgb(c: vec3<f32>) -> vec3<f32> {
-    let K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    let p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, vec3(0.0), vec3(1.0)), c.y);
+    return vec4<f32>(colour, 1.0);
 }

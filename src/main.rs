@@ -32,8 +32,7 @@ fn setup(
         mesh: meshes.add(Rectangle::default()).into(),
         transform: Transform::default().with_scale(Vec3::splat(720.)),
         material: materials.add(CustomMaterial {
-            color: Color::GOLD,
-            // color_texture: Some(asset_server.load("icon.png")),
+            color: LinearRgba::GREEN, // color_texture: Some(asset_server.load("icon.png")),
         }),
         ..default()
     });
@@ -43,7 +42,7 @@ fn setup(
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct CustomMaterial {
     #[uniform(0)]
-    color: Color,
+    color: LinearRgba,
     // #[texture(1)]
     // #[sampler(2)]
     // color_texture: Option<Handle<Image>>,
