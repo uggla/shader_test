@@ -21,6 +21,7 @@ enum ShaderNameValue {
     Goldcube,
     Circle,
     HypnoticCircle,
+    Crystal,
 }
 
 #[derive(Resource)]
@@ -42,11 +43,13 @@ fn main() {
     app.add_plugins(Material2dPlugin::<GoldcubeMaterial>::default());
     app.add_plugins(Material2dPlugin::<CircleMaterial>::default());
     app.add_plugins(Material2dPlugin::<HypnoticCircleMaterial>::default());
+    app.add_plugins(Material2dPlugin::<CrystalMaterial>::default());
 
     app.run();
 }
 
 // Setup a simple 2d scene
+#[allow(clippy::too_many_arguments)]
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -54,6 +57,7 @@ fn setup(
     mut gold_cube: ResMut<Assets<GoldcubeMaterial>>,
     mut circle: ResMut<Assets<CircleMaterial>>,
     mut hypnotic_circle: ResMut<Assets<HypnoticCircleMaterial>>,
+    mut crystal: ResMut<Assets<CrystalMaterial>>,
     shader_name: Res<ShaderName>,
     // asset_server: Res<AssetServer>,
 ) {
@@ -62,6 +66,18 @@ fn setup(
 
     // quad
     match shader_name.0 {
+        ShaderNameValue::Crystal => {
+            commands.spawn(MaterialMesh2dBundle {
+                mesh: meshes.add(Rectangle::default()).into(),
+                // transform: Transform::default().with_scale(Vec3::splat(720.)),
+                transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+                material: crystal.add(CrystalMaterial {
+                    // color_texture: Some(asset_server.load("icon.png")),
+                    color: LinearRgba::from(color::palettes::css::GOLD),
+                }),
+                ..default()
+            });
+        }
         ShaderNameValue::Water => {
             commands.spawn(MaterialMesh2dBundle {
                 mesh: meshes.add(Rectangle::default()).into(),
@@ -158,4 +174,16 @@ impl Material2d for HypnoticCircleMaterial {
     fn fragment_shader() -> ShaderRef {
         "hypnotic_circle_material.wgsl".into()
     }
+}
+
+impl Material2d for CrystalMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "crystal_material.wgsl".into()
+    }
+}
+
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
+struct CrystalMaterial {
+    #[uniform(0)]
+    color: LinearRgba,
 }
