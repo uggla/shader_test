@@ -22,6 +22,7 @@ enum ShaderNameValue {
     Circle,
     HypnoticCircle,
     Crystal,
+    Stars,
 }
 
 #[derive(Resource)]
@@ -44,6 +45,7 @@ fn main() {
     app.add_plugins(Material2dPlugin::<CircleMaterial>::default());
     app.add_plugins(Material2dPlugin::<HypnoticCircleMaterial>::default());
     app.add_plugins(Material2dPlugin::<CrystalMaterial>::default());
+    app.add_plugins(Material2dPlugin::<StarsMaterial>::default());
 
     app.run();
 }
@@ -58,6 +60,7 @@ fn setup(
     mut circle: ResMut<Assets<CircleMaterial>>,
     mut hypnotic_circle: ResMut<Assets<HypnoticCircleMaterial>>,
     mut crystal: ResMut<Assets<CrystalMaterial>>,
+    mut stars: ResMut<Assets<StarsMaterial>>,
     shader_name: Res<ShaderName>,
     // asset_server: Res<AssetServer>,
 ) {
@@ -66,6 +69,18 @@ fn setup(
 
     // quad
     match shader_name.0 {
+        ShaderNameValue::Stars => {
+            commands.spawn(MaterialMesh2dBundle {
+                mesh: meshes.add(Rectangle::default()).into(),
+                // transform: Transform::default().with_scale(Vec3::splat(720.)),
+                transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+                material: stars.add(StarsMaterial {
+                    // color_texture: Some(asset_server.load("icon.png")),
+                    color: LinearRgba::from(color::palettes::css::GOLD),
+                }),
+                ..default()
+            });
+        }
         ShaderNameValue::Crystal => {
             commands.spawn(MaterialMesh2dBundle {
                 mesh: meshes.add(Rectangle::default()).into(),
@@ -184,6 +199,18 @@ impl Material2d for CrystalMaterial {
 
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct CrystalMaterial {
+    #[uniform(0)]
+    color: LinearRgba,
+}
+
+impl Material2d for StarsMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "stars_material.wgsl".into()
+    }
+}
+
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
+struct StarsMaterial {
     #[uniform(0)]
     color: LinearRgba,
 }
