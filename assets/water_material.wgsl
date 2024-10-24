@@ -6,7 +6,6 @@
 #import bevy_sprite::mesh2d_vertex_output::VertexOutput
 #import bevy_sprite::mesh2d_view_bindings::globals
 #import "shader_utils.wgsl"::NEG_HALF_PI
-#import "shader_utils.wgsl"::NEG_HALF_PI
 #import "shader_utils.wgsl"::shader_toy_default
 #import "shader_utils.wgsl"::rotate2D
 #import "shader_utils.wgsl"::TAU
