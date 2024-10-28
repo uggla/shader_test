@@ -24,6 +24,7 @@ enum ShaderNameValue {
     Crystal,
     Stars,
     Smoke,
+    SmokeRust,
 }
 
 #[derive(Resource)]
@@ -48,6 +49,7 @@ fn main() {
     app.add_plugins(Material2dPlugin::<CrystalMaterial>::default());
     app.add_plugins(Material2dPlugin::<StarsMaterial>::default());
     app.add_plugins(Material2dPlugin::<SmokeMaterial>::default());
+    app.add_plugins(Material2dPlugin::<SmokeRustMaterial>::default());
 
     app.run();
 }
@@ -64,8 +66,9 @@ fn setup(
     mut crystal: ResMut<Assets<CrystalMaterial>>,
     mut stars: ResMut<Assets<StarsMaterial>>,
     mut smoke: ResMut<Assets<SmokeMaterial>>,
+    mut smoke_rust: ResMut<Assets<SmokeRustMaterial>>,
     shader_name: Res<ShaderName>,
-    // asset_server: Res<AssetServer>,
+    asset_server: Res<AssetServer>,
 ) {
     // camera
     commands.spawn(Camera2dBundle::default());
@@ -90,8 +93,25 @@ fn setup(
                 // transform: Transform::default().with_scale(Vec3::splat(720.)),
                 transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
                 material: smoke.add(SmokeMaterial {
-                    // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
+                    // color_texture: Some(asset_server.load("icon.png")),
+                }),
+                ..default()
+            });
+        }
+        ShaderNameValue::SmokeRust => {
+            commands.spawn(MaterialMesh2dBundle {
+                mesh: meshes.add(Rectangle::default()).into(),
+                // transform: Transform::default().with_scale(Vec3::splat(720.)),
+                transform: Transform::default().with_scale(Vec3::new(720.0, 720.0, 1.0)),
+                material: smoke_rust.add(SmokeRustMaterial {
+                    color_texture: Some(asset_server.load("rust_logo.png")),
+                    color: LinearRgba {
+                        red: 1.0,
+                        green: 0.44,
+                        blue: 0.04,
+                        alpha: 1.0,
+                    },
                 }),
                 ..default()
             });
@@ -240,4 +260,19 @@ impl Material2d for SmokeMaterial {
 struct SmokeMaterial {
     #[uniform(0)]
     color: LinearRgba,
+}
+
+impl Material2d for SmokeRustMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "smoke_rust_material.wgsl".into()
+    }
+}
+
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
+struct SmokeRustMaterial {
+    #[uniform(0)]
+    color: LinearRgba,
+    #[texture(1)]
+    #[sampler(2)]
+    color_texture: Option<Handle<Image>>,
 }
