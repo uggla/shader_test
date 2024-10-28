@@ -23,6 +23,7 @@ enum ShaderNameValue {
     HypnoticCircle,
     Crystal,
     Stars,
+    Smoke,
 }
 
 #[derive(Resource)]
@@ -46,6 +47,7 @@ fn main() {
     app.add_plugins(Material2dPlugin::<HypnoticCircleMaterial>::default());
     app.add_plugins(Material2dPlugin::<CrystalMaterial>::default());
     app.add_plugins(Material2dPlugin::<StarsMaterial>::default());
+    app.add_plugins(Material2dPlugin::<SmokeMaterial>::default());
 
     app.run();
 }
@@ -61,6 +63,7 @@ fn setup(
     mut hypnotic_circle: ResMut<Assets<HypnoticCircleMaterial>>,
     mut crystal: ResMut<Assets<CrystalMaterial>>,
     mut stars: ResMut<Assets<StarsMaterial>>,
+    mut smoke: ResMut<Assets<SmokeMaterial>>,
     shader_name: Res<ShaderName>,
     // asset_server: Res<AssetServer>,
 ) {
@@ -75,6 +78,18 @@ fn setup(
                 // transform: Transform::default().with_scale(Vec3::splat(720.)),
                 transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
                 material: stars.add(StarsMaterial {
+                    // color_texture: Some(asset_server.load("icon.png")),
+                    color: LinearRgba::from(color::palettes::css::GOLD),
+                }),
+                ..default()
+            });
+        }
+        ShaderNameValue::Smoke => {
+            commands.spawn(MaterialMesh2dBundle {
+                mesh: meshes.add(Rectangle::default()).into(),
+                // transform: Transform::default().with_scale(Vec3::splat(720.)),
+                transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+                material: smoke.add(SmokeMaterial {
                     // color_texture: Some(asset_server.load("icon.png")),
                     color: LinearRgba::from(color::palettes::css::GOLD),
                 }),
@@ -211,6 +226,18 @@ impl Material2d for StarsMaterial {
 
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct StarsMaterial {
+    #[uniform(0)]
+    color: LinearRgba,
+}
+
+impl Material2d for SmokeMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "smoke_material.wgsl".into()
+    }
+}
+
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
+struct SmokeMaterial {
     #[uniform(0)]
     color: LinearRgba,
 }
