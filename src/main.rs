@@ -159,10 +159,17 @@ fn setup(
         }
 
         ShaderNameValue::Snow => {
+            // Background image
+            commands.spawn((
+                Sprite::from_image(asset_server.load("photo.png")),
+                Transform::default().with_translation(Vec3::new(0.0, 0.0, -1.0)),
+            ));
+            
+            // Snow overlay
             commands.spawn((
                 Mesh2d(meshes.add(Rectangle::default())),
                 MeshMaterial2d(snow.add(SnowMaterial {
-                    color: LinearRgba::from(color::palettes::css::BLACK),
+                    color: LinearRgba::from(color::palettes::css::WHITE),
                 })),
                 Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
             ));
@@ -288,5 +295,9 @@ struct SnowMaterial {
 impl Material2d for SnowMaterial {
     fn fragment_shader() -> ShaderRef {
         "snow_material.wgsl".into()
+    }
+    
+    fn alpha_mode(&self) -> AlphaMode2d {
+        AlphaMode2d::Blend
     }
 }

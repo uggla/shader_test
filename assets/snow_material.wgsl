@@ -29,21 +29,22 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     // Flip Y coordinate to match Shadertoy coordinate system
     uv.y = 1.0 - uv.y;
 
-    // Convert to shadertoy coordinate system (aspect ratio correction)
-    let resolution = view.viewport.zw;
-    uv = uv * resolution.y / resolution.x;
+    // Keep original UV coordinates for proper circles
+    // (Remove aspect ratio correction that was distorting the circles)
 
-    var fragColor = color;
+    // Transparent background - only show snowflakes
+    var fragColor = vec4<f32>(0.0, 0.0, 0.0, 0.0);
     var j: f32;
 
     for (var i: i32 = 0; i < _SnowflakeAmount; i++) {
         j = f32(i);
         let speed = 0.3 + rnd(cos(j)) * (0.7 + 0.5 * cos(j / (f32(_SnowflakeAmount) * 0.25)));
         let center = vec2<f32>(
-            (0.25 - uv.y) * _BlizardFactor + rnd(j) + 0.1 * cos(time + sin(j)),
-            modulo(sin(j) - speed * (time * 1.5 * (0.1 + _BlizardFactor)), 0.65)
+            (0.25 - (1.0 - uv.y)) * _BlizardFactor + rnd(j) + 0.1 * cos(time + sin(j)),
+            modulo(sin(j) - speed * (time * 1.5 * (0.1 + _BlizardFactor)), 1.0)
         );
-        fragColor += vec4<f32>(0.09 * drawCircle(uv, center, 0.0005 + speed * 0.006));
+        let snowflake = drawCircle(uv, center, 0.0005 + speed * 0.006);
+        fragColor += vec4<f32>(snowflake, snowflake, snowflake, snowflake * 0.8);
     }
 
     return fragColor;
