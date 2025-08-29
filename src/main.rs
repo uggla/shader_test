@@ -6,7 +6,7 @@ use bevy::{
     prelude::*,
     reflect::TypePath,
     render::render_resource::{AsBindGroup, ShaderRef},
-    sprite::{Material2d, Material2dPlugin, MaterialMesh2dBundle},
+    sprite::{AlphaMode2d, Material2d, Material2dPlugin},
 };
 
 #[derive(Parser, Clone)]
@@ -71,103 +71,88 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     // camera
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 
     // quad
     match shader_name.0 {
         ShaderNameValue::Stars => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                // transform: Transform::default().with_scale(Vec3::splat(720.)),
-                transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
-                material: stars.add(StarsMaterial {
-                    // color_texture: Some(asset_server.load("icon.png")),
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(stars.add(StarsMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
         }
         ShaderNameValue::Smoke => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                // transform: Transform::default().with_scale(Vec3::splat(720.)),
-                transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
-                material: smoke.add(SmokeMaterial {
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(smoke.add(SmokeMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
-                    // color_texture: Some(asset_server.load("icon.png")),
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
         }
+
         ShaderNameValue::SmokeRust => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                // transform: Transform::default().with_scale(Vec3::splat(720.)),
-                transform: Transform::default().with_scale(Vec3::new(720.0, 720.0, 1.0)),
-                material: smoke_rust.add(SmokeRustMaterial {
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(smoke_rust.add(SmokeRustMaterial {
+                    color: LinearRgba::from(color::palettes::css::GOLD),
                     color_texture: Some(asset_server.load("rust_logo.png")),
-                    color: LinearRgba {
-                        red: 1.0,
-                        green: 0.44,
-                        blue: 0.04,
-                        alpha: 1.0,
-                    },
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(720.0, 720.0, 1.0)),
+            ));
         }
+
         ShaderNameValue::Crystal => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                // transform: Transform::default().with_scale(Vec3::splat(720.)),
-                transform: Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
-                material: crystal.add(CrystalMaterial {
-                    // color_texture: Some(asset_server.load("icon.png")),
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(crystal.add(CrystalMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
         }
+
         ShaderNameValue::Water => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                transform: Transform::default().with_scale(Vec3::splat(720.)),
-                material: water.add(WaterMaterial {
-                    // color_texture: Some(asset_server.load("icon.png")),
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(water.add(WaterMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
         }
+
         ShaderNameValue::Goldcube => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                transform: Transform::default().with_scale(Vec3::splat(720.)),
-                material: gold_cube.add(GoldcubeMaterial {
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(gold_cube.add(GoldcubeMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
         }
+
         ShaderNameValue::Circle => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                transform: Transform::default().with_scale(Vec3::splat(720.)),
-                material: circle.add(CircleMaterial {
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(circle.add(CircleMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
         }
+
         ShaderNameValue::HypnoticCircle => {
-            commands.spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Rectangle::default()).into(),
-                transform: Transform::default().with_scale(Vec3::splat(720.)),
-                material: hypnotic_circle.add(HypnoticCircleMaterial {
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(hypnotic_circle.add(HypnoticCircleMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
-                }),
-                ..default()
-            });
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
         }
     }
 }
@@ -265,6 +250,10 @@ struct SmokeMaterial {
 impl Material2d for SmokeRustMaterial {
     fn fragment_shader() -> ShaderRef {
         "smoke_rust_material.wgsl".into()
+    }
+
+    fn alpha_mode(&self) -> AlphaMode2d {
+        AlphaMode2d::Blend
     }
 }
 
