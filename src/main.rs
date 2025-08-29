@@ -25,6 +25,7 @@ enum ShaderNameValue {
     Stars,
     Smoke,
     SmokeRust,
+    Snow,
 }
 
 #[derive(Resource)]
@@ -50,6 +51,7 @@ fn main() {
     app.add_plugins(Material2dPlugin::<StarsMaterial>::default());
     app.add_plugins(Material2dPlugin::<SmokeMaterial>::default());
     app.add_plugins(Material2dPlugin::<SmokeRustMaterial>::default());
+    app.add_plugins(Material2dPlugin::<SnowMaterial>::default());
 
     app.run();
 }
@@ -67,6 +69,7 @@ fn setup(
     mut stars: ResMut<Assets<StarsMaterial>>,
     mut smoke: ResMut<Assets<SmokeMaterial>>,
     mut smoke_rust: ResMut<Assets<SmokeRustMaterial>>,
+    mut snow: ResMut<Assets<SnowMaterial>>,
     shader_name: Res<ShaderName>,
     asset_server: Res<AssetServer>,
 ) {
@@ -150,6 +153,16 @@ fn setup(
                 Mesh2d(meshes.add(Rectangle::default())),
                 MeshMaterial2d(hypnotic_circle.add(HypnoticCircleMaterial {
                     color: LinearRgba::from(color::palettes::css::GOLD),
+                })),
+                Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
+            ));
+        }
+
+        ShaderNameValue::Snow => {
+            commands.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(snow.add(SnowMaterial {
+                    color: LinearRgba::from(color::palettes::css::BLACK),
                 })),
                 Transform::default().with_scale(Vec3::new(1280.0, 720.0, 1.0)),
             ));
@@ -264,4 +277,16 @@ struct SmokeRustMaterial {
     #[texture(1)]
     #[sampler(2)]
     color_texture: Option<Handle<Image>>,
+}
+
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
+struct SnowMaterial {
+    #[uniform(0)]
+    color: LinearRgba,
+}
+
+impl Material2d for SnowMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "snow_material.wgsl".into()
+    }
 }
